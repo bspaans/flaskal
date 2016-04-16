@@ -1,6 +1,8 @@
 from flask import Flask, g
 from flask.ext.restful import Api
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 import json
 
 
@@ -51,6 +53,25 @@ class Controller(object):
             print e
             return 'No way', 400
 
+ 
+@app.before_request
+def before_request():
+    # Create an engine that stores data in the local directory's
+    # sqlalchemy_example.db file.
+    engine = create_engine('sqlite:///sqlalchemy_example.db')
+     
+    # Create all tables in the engine. This is equivalent to "Create Table"
+    # statements in raw SQL.
+    #Base.metadata.create_all(engine)
+
+    Base.metadata.bind = engine
+
+    DBSession = sessionmaker(bind=engine)
+    g.db = DBSession()
+
+@app.teardown_request
+def teardown_request(exception):
+    pass
 
 
 Base = declarative_base(cls=NewBase)
