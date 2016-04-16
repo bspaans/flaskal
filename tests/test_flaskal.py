@@ -24,17 +24,9 @@ Test:
 """
 
 class FlaskalTest(unittest.TestCase):
-    def setUp(self):
-        self.proc = None
-        if os.path.exists(DB_LOCATION):
-            os.unlink(DB_LOCATION)
-        conn = sqlite3.connect(DB_LOCATION)
-        c = conn.cursor()
-        c.execute(test_sql)
-        conn.commit()
-        conn.close()
 
-    def test_flaskal_happy_path(self):
+    def start_server(self):
+        self.proc = None
 
         code = yaml_to_code(test_yaml)
         assert_that(code, contains_string("class Test(Base)"))
@@ -44,6 +36,21 @@ class FlaskalTest(unittest.TestCase):
 
         self.proc = subprocess.Popen(['python', '/tmp/test_flaskal_app.py'])
         time.sleep(1)
+
+    def setUp(self):
+        if os.path.exists(DB_LOCATION):
+            os.unlink(DB_LOCATION)
+        conn = sqlite3.connect(DB_LOCATION)
+        c = conn.cursor()
+        c.execute(test_sql)
+        conn.commit()
+        conn.close()
+        try:
+            requests.get("http://localhost:5000/?start_test")
+        except:
+            self.start_server()
+
+    def test_flaskal_happy_path(self):
 
         resp = requests.get('http://localhost:5000/api/test/')
         assert_that(resp.status_code, equal_to(200))
@@ -67,7 +74,6 @@ class FlaskalTest(unittest.TestCase):
         resp = requests.delete('http://localhost:5000/api/test/%d/' % id)
         assert_that(resp.status_code, equal_to(200))
 
-        time.sleep(0.5)
         resp = requests.get('http://localhost:5000/api/test/%d/' % id)
         assert_that(resp.status_code, equal_to(404))
 
@@ -75,8 +81,23 @@ class FlaskalTest(unittest.TestCase):
         assert_that(resp.status_code, equal_to(200))
         assert_that(resp.json(), equal_to([]))
 
-    def tearDown(self):
-        if self.proc is not None:
-            self.proc.kill()
-            self.proc.terminate()
-            self.proc.wait()
+    def test_flaskal_filter(self):
+
+        resp = requests.post('http://localhost:5000/api/test/', 
+                             json={"name": "bart"})
+        assert_that(resp.status_code, equal_to(200))
+        assert_that(resp.json(), has_key("name"))
+        assert_that(resp.json(), has_key("id"))
+        id = resp.json()['id']
+
+        resp = requests.post('http://localhost:5000/api/test/', 
+                             json={"name": "someone else"})
+        assert_that(resp.status_code, equal_to(200))
+        assert_that(resp.json(), has_key("name"))
+        assert_that(resp.json(), has_key("id"))
+
+        resp = requests.get('http://localhost:5000/api/test/', params={'name': 'bart'})
+        assert_that(resp.status_code, equal_to(200))
+        assert_that(resp.json(), equal_to([{'name': 'bart', 'id': id}]))
+
+

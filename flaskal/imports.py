@@ -1,5 +1,5 @@
-from flask import Flask, g
-from flask.ext.restful import Api
+from flask import Flask, g, url_for, request
+from flask.ext.restful import Api, Resource
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -26,7 +26,8 @@ class Controller(object):
 
     def get_one(self, db, id):
         try:
-            r = db.query(self.cls).filter(self.cls.id == id).one()
+            d = {"id": id}
+            r = db.query(self.cls).filter_by(**d).one()
         except Exception, e:
             return "Not found", 404
         return r.to_dict(), 200
@@ -40,9 +41,17 @@ class Controller(object):
         db.commit()
         return "OK", 200
 
+    def build_filter(self, multi_dict):
+        queryable_columns = [ c.name for c in self.cls.__table__.columns ]
+        filter = {}
+        for key, val in multi_dict.iteritems():
+            if key in queryable_columns:
+                filter[key] = val
+        return filter
 
     def get_all(self, db):
-        return map(lambda s: s.to_dict(), db.query(self.cls).all())
+        filter = self.build_filter(request.args)
+        return map(lambda s: s.to_dict(), db.query(self.cls).filter_by(**filter).all())
 
     def create_from_dict(self, db, payload):
         resource = self.cls()
@@ -83,5 +92,14 @@ def before_request():
 def teardown_request(exception):
     pass
 
+class SitemapResource(Resource):
+    def get(self):
+        ignored_rules = ['/', '/static/<path:filename>']
+        links = []
+        for rule in app.url_map.iter_rules():
+            if rule.rule not in ignored_rules:
+                links.append(rule.rule)
+        return {'links': links}
 
+api.add_resource(SitemapResource, '/')
 Base = declarative_base(cls=NewBase)
