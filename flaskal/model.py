@@ -73,7 +73,7 @@ class Model(object):
         model = self.name.capitalize()
         return {"%sResource" % model: "%s.restful" % model, 
                 "Single%sResource" % model:
-                "%s.restful + \"<int:id>\"" % model}
+                "%s.restful + \"<int:id>/\"" % model}
 
     def __repr__(self):
         return self.generate_code_in_single_string()

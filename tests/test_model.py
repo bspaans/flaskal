@@ -12,6 +12,8 @@ test_single_resource = """
 class SingleTestResource(Resource):
     def get(self, id):
         return TestController().get_one(g.db, id)
+    def delete(self, id):
+        return TestController().delete_one(g.db, id)
 """
 
 test_multi_resource = """
@@ -129,4 +131,4 @@ class ModelTest(unittest.TestCase):
         assert_that(endpoints, has_entry('TestResource',
                                          'Test.restful'))
         assert_that(endpoints, has_entry('SingleTestResource',
-                                         'Test.restful + "<int:id>"'))
+                                         'Test.restful + "<int:id>/"'))

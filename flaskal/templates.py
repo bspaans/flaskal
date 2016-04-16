@@ -8,7 +8,7 @@ from sqlalchemy.orm import relationship
  
 from flask import Flask, g, request
 from flask.ext.restful import Resource
-from common import app, api, Base, Controller
+from flaskal.imports import app, api, Base, Controller
 
 {code}
 
@@ -52,6 +52,8 @@ single_resource = """
 class Single{name}Resource(Resource):
     def get(self, id):
         return {name}Controller().get_one(g.db, id)
+    def delete(self, id):
+        return {name}Controller().delete_one(g.db, id)
 """
 
 multi_resource = """

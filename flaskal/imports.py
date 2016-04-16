@@ -31,6 +31,16 @@ class Controller(object):
             return "Not found", 404
         return r.to_dict(), 200
 
+    def delete_one(self, db, id):
+        try:
+            r = db.query(self.cls).filter(self.cls.id == id).first()
+        except Exception, e:
+            return "Not found", 404
+        db.delete(r)
+        db.commit()
+        return "OK", 200
+
+
     def get_all(self, db):
         return map(lambda s: s.to_dict(), db.query(self.cls).all())
 
@@ -58,7 +68,7 @@ class Controller(object):
 def before_request():
     # Create an engine that stores data in the local directory's
     # sqlalchemy_example.db file.
-    engine = create_engine('sqlite:///sqlalchemy_example.db')
+    engine = create_engine('sqlite:////tmp/flaskal.db')
      
     # Create all tables in the engine. This is equivalent to "Create Table"
     # statements in raw SQL.
