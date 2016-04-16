@@ -1,0 +1,19 @@
+Person:
+  rest: /api/person/
+  table: person
+  columns:
+  - name=id type=integer primary_key=True allowed_in_create=False
+  - name=name type=string(250) nullable=False required=True
+  
+Address:
+  rest: /api/address/
+  table: address
+  columns:
+  - name=id type=integer primary_key=True allowed_in_create=False
+  - name=street_name type=string(250)
+  - name=street_number type=string(250)
+  - name=post_code type=string(250) nullable=False required=True
+  - name=person_id type=integer foreign_key=person.id 
+  relationships:
+  - Person
+
