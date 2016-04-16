@@ -77,4 +77,3 @@ class Model(object):
 
     def __repr__(self):
         return self.generate_code_in_single_string()
-        return '<%s %s %s: [%s]' % (self.name, self.rest, self.table, ", ".join(map(lambda s: str(s), self.columns)))

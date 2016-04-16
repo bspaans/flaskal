@@ -1,3 +1,30 @@
+code = """
+import os
+import sys
+import json
+
+from sqlalchemy import Column, ForeignKey, Integer, String
+from sqlalchemy.orm import relationship
+ 
+from flask import Flask, g, request
+from flask.ext.restful import Resource
+from common import app, api, Base, Controller
+
+{code}
+
+def main():
+    app.debug = app.config['DEBUG']
+    app.run(host='0.0.0.0', threaded=True)
+
+if __name__ == '__main__':
+    main()
+
+"""
+
+#####################
+# SQL ALCHEMY MODEL #
+#####################
+
 base_model = """
 class {name}(Base):
     __tablename__ = '{table}'
@@ -6,6 +33,7 @@ class {name}(Base):
     required_in_create = [{required_in_create}]
     {columns}
 """
+
 ######################
 # SQL ALCHEMY COLUMN #
 ######################
