@@ -29,8 +29,9 @@ class ModelParserTest(unittest.TestCase):
 
     def test_parser_columns(self):
         c = ModelParser()
-        model = {'columns': ['name=test type=integer']}
+        model = {'columns': ['name=test type=integer default=50']}
         result = c.parse('test', model)
         assert_that(result.columns[0].name, equal_to('test'))
         assert_that(result.columns[0].type, equal_to('integer'))
+        assert_that(result.columns[0].default, equal_to('50'))
 

@@ -18,6 +18,13 @@ class ColumnTest(unittest.TestCase):
         c.primary_key=True
         assert_that(c.to_alchemy(), contains_string("primary_key=True"))
 
+    def test_default_to_alchemy(self):
+        c = Column('test', 'integer')
+        c.default = None
+        assert_that(c.to_alchemy(), not_(contains_string("default")))
+        c.default = "10"
+        assert_that(c.to_alchemy(), contains_string("default=10"))
+
     def test_not_nullable_to_alchemy(self):
         c = Column('test', 'integer')
         c.nullable=True

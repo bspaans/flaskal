@@ -11,7 +11,7 @@ DB_LOCATION = '/tmp/flaskal.db'
 
 test_sql = """
 CREATE TABLE test 
-(id INTEGER PRIMARY KEY ASC, name VARCHAR(250));
+(id INTEGER PRIMARY KEY ASC, name VARCHAR(250), age INTEGER DEFAULT 30);
 """
 
 test_yaml = """
@@ -21,6 +21,7 @@ Test:
     columns:
     - name=id type=integer primary_key=True
     - name=name type=String(250)
+    - name=age type=Integer default=50
 """
 
 class FlaskalTest(unittest.TestCase):
@@ -66,6 +67,8 @@ class FlaskalTest(unittest.TestCase):
         resp = requests.get('http://localhost:5000/api/test/%d/' % id)
         assert_that(resp.status_code, equal_to(200))
         assert_that(resp.json()['name'], equal_to('bart'))
+        assert_that(resp.json()['id'], equal_to(id))
+        assert_that(resp.json()['age'], equal_to(50))
 
         resp = requests.get('http://localhost:5000/api/test/')
         assert_that(resp.status_code, equal_to(200))
@@ -98,7 +101,8 @@ class FlaskalTest(unittest.TestCase):
 
         resp = requests.get('http://localhost:5000/api/test/', params={'name': 'bart'})
         assert_that(resp.status_code, equal_to(200))
-        assert_that(resp.json(), equal_to([{'name': 'bart', 'id': id}]))
+        assert_that(resp.json()[0]['name'], equal_to('bart'))
+        assert_that(resp.json()[0]['id'], equal_to(id))
 
     def test_flaskal_filter_delete(self):
 

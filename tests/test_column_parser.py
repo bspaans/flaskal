@@ -66,3 +66,8 @@ class ColumnParserTest(unittest.TestCase):
         c = ColumnParser()
         with self.assertRaises(ValueError):
             c.parse('unknown=false')
+
+    def test_parser_default(self):
+        c = ColumnParser()
+        result = c.parse('default=10')
+        assert_that(result.default, equal_to('10'))

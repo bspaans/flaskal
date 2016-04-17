@@ -10,6 +10,7 @@ class Column(object):
         self.nullable = True
         self.allowed_in_create = True 
         self.required_in_create = False
+        self.default = None
 
     def to_alchemy(self):
         if self.name is None or self.type is None:
@@ -21,6 +22,8 @@ class Column(object):
             args.append(templates.nullable)
         if self.foreign_key is not None:
             args.append(templates.foreign_key % self.foreign_key)
+        if self.default is not None:
+            args.append(templates.default % self.default)
         return templates.column % (self.name, ','.join(args))
 
     def __repr__(self):

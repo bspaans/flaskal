@@ -41,6 +41,7 @@ primary_key = 'primary_key=True'
 nullable    = 'nullable=False'
 foreign_key = "ForeignKey('%s')"
 column      = "%s = Column(%s)"
+default     = "default=%s"
 allowed_in_create = "allowed_in_create = [%s]"
 required_in_create = "required_in_create = [%s]"
 

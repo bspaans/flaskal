@@ -2,7 +2,7 @@ from model import Column, Model
 
 class ColumnParser(object):
     def __init__(self):
-        self.simple_kv = ['name', 'type', 'foreign_key']
+        self.simple_kv = ['name', 'type', 'foreign_key', 'default']
         self.bool_kv = ['primary_key', 'allowed_in_create', 'nullable']
         self.bool_values = ['True', 'False']
         self.kv_separator = '='
@@ -18,6 +18,7 @@ class ColumnParser(object):
             key, val = part.split(self.kv_separator)
             if key in self.simple_kv:
                 setattr(column, key, val)
+                print getattr(column, key)
             elif key in self.bool_kv:
                 self.set_bool(column, key, val)
             elif key == 'required':
