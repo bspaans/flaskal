@@ -41,6 +41,12 @@ class Controller(object):
         db.commit()
         return "OK", 200
 
+    def delete_all(self, db, args):
+        filter = self.build_filter(args)
+        db.query(self.cls).filter_by(**filter).delete()
+        db.commit()
+        return "OK", 200
+
     def build_filter(self, multi_dict):
         queryable_columns = [ c.name for c in self.cls.__table__.columns ]
         filter = {}
@@ -49,9 +55,10 @@ class Controller(object):
                 filter[key] = val
         return filter
 
-    def get_all(self, db):
-        filter = self.build_filter(request.args)
-        return map(lambda s: s.to_dict(), db.query(self.cls).filter_by(**filter).all())
+    def get_all(self, db, args):
+        filter = self.build_filter(args)
+        return map(lambda s: s.to_dict(), 
+                   db.query(self.cls).filter_by(**filter).all())
 
     def create_from_dict(self, db, payload):
         resource = self.cls()

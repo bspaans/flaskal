@@ -100,4 +100,25 @@ class FlaskalTest(unittest.TestCase):
         assert_that(resp.status_code, equal_to(200))
         assert_that(resp.json(), equal_to([{'name': 'bart', 'id': id}]))
 
+    def test_flaskal_filter_delete(self):
+
+        resp = requests.post('http://localhost:5000/api/test/', 
+                             json={"name": "bart"})
+        assert_that(resp.status_code, equal_to(200))
+        assert_that(resp.json(), has_key("name"))
+        assert_that(resp.json(), has_key("id"))
+        id = resp.json()['id']
+
+        resp = requests.post('http://localhost:5000/api/test/', 
+                             json={"name": "someone else"})
+        assert_that(resp.status_code, equal_to(200))
+        assert_that(resp.json(), has_key("name"))
+        assert_that(resp.json(), has_key("id"))
+
+        resp = requests.delete('http://localhost:5000/api/test/', params={'name': 'bart'})
+        assert_that(resp.status_code, equal_to(200))
+
+        resp = requests.get('http://localhost:5000/api/test/')
+        assert_that(resp.status_code, equal_to(200))
+        assert_that(resp.json()[0]['name'], equal_to('someone else'))
 

@@ -59,10 +59,14 @@ class Single{name}Resource(Resource):
 multi_resource = """
 class {name}Resource(Resource):
     def get(self):
-        return {name}Controller().get_all(g.db)
+        args = request.args
+        return {name}Controller().get_all(g.db, args)
     def post(self):
         payload = json.loads(request.data)
         return {name}Controller().create_from_dict(g.db, payload)
+    def delete(self):
+        args = request.args
+        return {name}Controller().delete_all(g.db, args)
 """
 
 controller = """

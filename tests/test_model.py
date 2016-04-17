@@ -19,10 +19,14 @@ class SingleTestResource(Resource):
 test_multi_resource = """
 class TestResource(Resource):
     def get(self):
-        return TestController().get_all(g.db)
+        args = request.args
+        return TestController().get_all(g.db, args)
     def post(self):
         payload = json.loads(request.data)
         return TestController().create_from_dict(g.db, payload)
+    def delete(self):
+        args = request.args
+        return TestController().delete_all(g.db, args)
 """
 
 test_alchemy_model = """
